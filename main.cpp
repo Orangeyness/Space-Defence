@@ -6,18 +6,36 @@
 #include <allegro.h>
 #include <stdlib.h>
 
+#define GFX_TYPE GFX_AUTODETECT_WINDOWED
+#define GFX_WIDTH 640
+#define GFX_HEIGHT 480
+
+#define FPS_TARGET 30
+
+volatile int updateCount;
+
+void timerUpdater() { updateCount++; }
+END_OF_FUNCTION(timerUpdater);
+
 int main(int argc, char * argv[]) {
 	if (allegro_init() != 0) return EXIT_FAILURE;
+	LOCK_VARIABLE(updateCount);
+	LOCK_FUNCTION(timerUpdater);
 	
 	install_timer();
 	install_keyboard();
 	
-	set_gfx_mode(GFX_AUTODETECT_WINDOWED, 640, 480, 0, 0);
+	set_gfx_mode(GFX_TYPE, GFX_WIDTH, GFX_HEIGHT, 0, 0);
 
-	clear_to_color(screen, makecol(255, 255, 255));	
-	triangle(screen, 20, 20, 50, 50, 50, 100, makecol(50, 50, 50));
-	
-	while(!keypressed());
+	install_int(timerUpdater, 1000 / FPS_TARGET);
+
+	while(!keypressed()) {
+		clear_to_color(screen, makecol(255, 255, 255));	
+		textprintf_ex(screen, font, 20, 20, makecol(10, 10, 10), -1, "Counter: %d", updateCount);
+		
+		rest(10);
+		}
 
 	return EXIT_SUCCESS;
 	}
+END_OF_MAIN();
