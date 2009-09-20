@@ -1,7 +1,9 @@
 #include <allegro.h>
 #include "stageInGame.h"
+#include "objectAsteroid.h"
 
 using namespace stages;
+using namespace objects;
 
 stageInGame::stageInGame() {
 	hudTargetX = SCREEN_W/2;
@@ -15,13 +17,17 @@ stageInGame::stageInGame() {
 
 	hudTargetLocked = false;
 
+	Asteroid = new objAsteroid(SCREEN_W/2, SCREEN_H/2, 50, 20);
 	}
 
 stageInGame::~stageInGame() {
+	delete Asteroid;
 	}
 
 bool stageInGame::update() {
 	if (key[KEY_ESC]) return false;
+
+	Asteroid->update();
 
 	updateHud();
 
@@ -30,8 +36,8 @@ bool stageInGame::update() {
 
 void stageInGame::draw(BITMAP *graphicsBuffer) {
 	clear_to_color(graphicsBuffer, C_BLACK);	
-	textprintf_ex(graphicsBuffer, font, 10, 10, C_WHITE, C_BLACK, "Left pressed: %c", key[KEY_LEFT]); 	
 
+	Asteroid->draw(graphicsBuffer);
 
 	drawHud(graphicsBuffer);
 	}
@@ -79,14 +85,22 @@ void stageInGame::updateHud() {
 
 	if (key[KEY_SPACE]) hudTargetLocked =!hudTargetLocked;
 
-	hudTargetX += hudTargetXSpeed;
-	hudTargetY += hudTargetYSpeed;
+	hudTargetX = (int)(hudTargetX + hudTargetXSpeed);
+	hudTargetY = (int)(hudTargetY + hudTargetYSpeed);
 	}
 
 void stageInGame::drawHud(BITMAP *graphicsBuffer) {
 	int Col = C_GREEN;
 	if (hudTargetLocked == true) Col = C_RED;
 
-	line(graphicsBuffer, 0, hudTargetY, SCREEN_W, hudTargetY, Col);	
-	line(graphicsBuffer, hudTargetX, 0, hudTargetX, SCREEN_H, Col);
+	line(graphicsBuffer, hudTargetX, 0, hudTargetX, hudTargetY - TARGET_SIZE, Col);	
+	line(graphicsBuffer, hudTargetX, hudTargetY + TARGET_SIZE, hudTargetX, SCREEN_H, Col);	
+	line(graphicsBuffer, 0, hudTargetY, hudTargetX - TARGET_SIZE, hudTargetY, Col);	
+	line(graphicsBuffer, hudTargetX + TARGET_SIZE, hudTargetY, SCREEN_W, hudTargetY, Col);	
+
+	line(graphicsBuffer, hudTargetX-TARGET_SIZE, hudTargetY - TARGET_SIZE/2, hudTargetX-TARGET_SIZE, hudTargetY + TARGET_SIZE/2, Col);
+	line(graphicsBuffer, hudTargetX+TARGET_SIZE, hudTargetY - TARGET_SIZE/2, hudTargetX+TARGET_SIZE, hudTargetY + TARGET_SIZE/2, Col);
+	line(graphicsBuffer, hudTargetX - TARGET_SIZE/2, hudTargetY-TARGET_SIZE, hudTargetX + TARGET_SIZE/2, hudTargetY-TARGET_SIZE, Col);
+	line(graphicsBuffer, hudTargetX - TARGET_SIZE/2, hudTargetY+TARGET_SIZE, hudTargetX + TARGET_SIZE/2, hudTargetY+TARGET_SIZE, Col);
+
 	}

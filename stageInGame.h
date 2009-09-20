@@ -4,11 +4,16 @@
 
 #include <allegro.h>
 #include "stageInterface.h"
+#include "objectInterface.h"
 
 #define C_WHITE makecol(255, 255, 255)
 #define C_BLACK makecol(0, 0, 0)
 #define C_GREEN makecol(0, 255, 0)
 #define C_RED makecol(255, 0, 0)
+
+#define TARGET_SIZE 32
+
+using namespace objects;
 
 namespace stages {
 
@@ -22,6 +27,8 @@ namespace stages {
 			double hudTargetAcceleration;
 			double hudTargetMaxSpeed;
 			bool hudTargetLocked;
+
+			ObjectInterface *Asteroid;
 
 			void updateHud();
 			void drawHud(BITMAP *graphicsBuffer);
