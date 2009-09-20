@@ -5,7 +5,7 @@
 
 using namespace objects;
 
-objAsteroid::objAsteroid(int startX, int startY, int approxRadius, int randomness) {
+objAsteroid::objAsteroid(int startX, int startY, int approxRadius, int randomness, int xSpeed, int ySpeed) {
 	X = startX;
 	Y = startY;
 	radius = approxRadius;
@@ -20,6 +20,9 @@ objAsteroid::objAsteroid(int startX, int startY, int approxRadius, int randomnes
 		}
 
 	radius = (int)(radius * (1-randomness/2));
+
+	Xspeed = xSpeed;
+	Yspeed = ySpeed;
 	}
 
 objAsteroid::~objAsteroid() {
@@ -28,6 +31,8 @@ objAsteroid::~objAsteroid() {
 	}
 
 void objAsteroid::update() {
+	X += Xspeed;
+	Y += Yspeed;
 	}
 
 void objAsteroid::draw(BITMAP *G) {

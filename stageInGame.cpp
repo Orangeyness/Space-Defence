@@ -5,10 +5,12 @@
 #include "objectAsteroid.h"
 #include "inputExtension.h"
 #include "stageInterface.h"
+#include "linkedlist.h"
 
 using namespace stages;
 using namespace objects;
 using namespace inputExt;
+using namespace linkedLists;
 
 stageInGame::stageInGame() {
 	hudTargetX = SCREEN_W/2;
@@ -24,17 +26,30 @@ stageInGame::stageInGame() {
 
 	hudTurretDirection = 0;
 
-	Asteroid = new objAsteroid(SCREEN_W/2, SCREEN_H/2, 50, 20);
+	objBullet = NULL;
+	objListAsteroid.addFirst(new objAsteroid(100, 100, 50, 20, 0, 1));
+	objListAsteroid.addFirst(new objAsteroid(100, 200, 40, 20, 0, 1));
 	}
 
 stageInGame::~stageInGame() {
-	delete Asteroid;
+	if (objBullet != NULL) delete objBullet;
+	
+	while(objListAsteroid.nodeCount > 0) {
+		delete objListAsteroid.getFirstValue();	
+		}
+
+	while(objListParticle.nodeCount > 0) {
+		delete objListParticle.getFirstValue();	
+		}
 	}
 
 bool stageInGame::update() {
 	if (keyboard::isKeyPressed(KEY_ESC)) return false;
 
-	Asteroid->update();
+	if (objBullet != NULL) objBullet->update();
+
+	updateObjectList(objListAsteroid.getFirst());
+	updateObjectList(objListParticle.getFirst());
 
 	updateHud();
 
@@ -44,7 +59,10 @@ bool stageInGame::update() {
 void stageInGame::draw(BITMAP *graphicsBuffer) {
 	clear_to_color(graphicsBuffer, C_BLACK);	
 
-	Asteroid->draw(graphicsBuffer);
+	if (objBullet != NULL) objBullet->draw(graphicsBuffer);
+
+	drawObjectList(objListAsteroid.getFirst(), graphicsBuffer);
+	drawObjectList(objListParticle.getFirst(), graphicsBuffer);
 
 	drawHud(graphicsBuffer);
 	drawTurret(graphicsBuffer);
@@ -113,6 +131,13 @@ void stageInGame::drawHud(BITMAP *graphicsBuffer) {
 	line(graphicsBuffer, hudTargetX - TARGET_SIZE/2, hudTargetY-TARGET_SIZE, hudTargetX + TARGET_SIZE/2, hudTargetY-TARGET_SIZE, Col);
 	line(graphicsBuffer, hudTargetX - TARGET_SIZE/2, hudTargetY+TARGET_SIZE, hudTargetX + TARGET_SIZE/2, hudTargetY+TARGET_SIZE, Col);
 
+	if (hudTargetLocked) {
+		}
+			else
+		{
+		textprintf_ex(graphicsBuffer, font, hudTargetX + TARGET_SIZE * 1.5, hudTargetY + 10, Col, C_BLACK, "(%d, %d)", hudTargetX, hudTargetY);
+		}
+
 	putpixel(graphicsBuffer, hudTargetX, hudTargetY, Col);
 	}
 
@@ -123,4 +148,18 @@ void stageInGame::drawTurret(BITMAP *graphicsBuffer) {
 
 	line(graphicsBuffer, TURRET_X, TURRET_Y, Dx, Dy, C_GREEN);
 	
+	}
+
+void stageInGame::updateObjectList(LinkedListNode<ObjectInterface*>* Node) {
+	while(Node != NULL) {
+		Node->getValue()->update();
+		Node = Node->getNext();
+		}
+	}
+
+void stageInGame::drawObjectList(LinkedListNode<ObjectInterface*>* Node, BITMAP* graphicsBuffer) {
+	while(Node != NULL) {
+		Node->getValue()->draw(graphicsBuffer);
+		Node = Node->getNext();
+		}
 	}

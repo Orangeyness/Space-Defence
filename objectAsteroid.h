@@ -20,8 +20,11 @@ namespace objects {
 			int *pointListY;
 			int radius;
 
+			int Xspeed;
+			int Yspeed;
+
 		public:
-			objAsteroid(int startX, int startY, int approxRadius, int randomness);
+			objAsteroid(int startX, int startY, int approxRadius, int randomness, int xSpeed, int ySpeed);
 			~objAsteroid();
 			virtual void update(); //updates the object.
 			virtual void draw(BITMAP *graphicsBuffer); //draws the object onto the given bitmap.

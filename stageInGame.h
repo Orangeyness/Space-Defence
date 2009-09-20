@@ -6,6 +6,7 @@
 
 #include "stageInterface.h"
 #include "objectInterface.h"
+#include "linkedLists.h"
 
 #define C_WHITE makecol(255, 255, 255)
 #define C_BLACK makecol(0, 0, 0)
@@ -13,6 +14,7 @@
 #define C_RED makecol(255, 0, 0)
 
 using namespace objects;
+using namespace linkedLists;
 
 namespace stages {
 	#define PI 3.14159265
@@ -36,11 +38,15 @@ namespace stages {
 			double hudTurretDirection;
 			double hudTurretTurnSpeed;
 
-			ObjectInterface *Asteroid;
+			ObjectInterface* objBullet;
+			LinkedList<ObjectInterface*> objListAsteroid;
+			LinkedList<ObjectInterface*> objListParticle;
 
 			void updateHud();
+			void updateObjectList(LinkedListNode<ObjectInterface*>* Node);
 			void drawHud(BITMAP *graphicsBuffer);
 			void drawTurret(BITMAP *graphicsBuffer);
+			void drawObjectList(LinkedListNode<ObjectInterface*>* Node, BITMAP *graphicsBuffer);
 
 		public:
 			stageInGame();
