@@ -9,14 +9,18 @@
 
 #include "stageInterface.h"
 #include "stageInGame.h"
+#include "inputExtension.h"
 
 #define GFX_TYPE GFX_AUTODETECT_WINDOWED
-#define GFX_WIDTH 800
-#define GFX_HEIGHT 600
+#define GFX_WIDTH 1024
+#define GFX_HEIGHT 768
 
 #define FPS_TARGET 30
 
+
+
 using namespace stages;
+using namespace inputExt;
 
 volatile int frameTickCount;
 void updateTicks();
@@ -32,6 +36,8 @@ int main(int argc, char * argv[]) {
 	LOCK_FUNCTION(updateTicks);
 
 	set_gfx_mode(GFX_TYPE, GFX_WIDTH, GFX_HEIGHT, 0, 0);
+
+	srand(time(NULL));
 
 	bool gameRunning = true;
 	time_t gameStartTime = time (NULL);
@@ -56,6 +62,8 @@ int main(int argc, char * argv[]) {
 		while (frameTickCount > 0 && gameRunning) {
 			frameTickCount --;
 			
+			keyboard::update();
+
 			gameRunning = gameCurrentStage->update();
 
 			framePastThisSecond ++;

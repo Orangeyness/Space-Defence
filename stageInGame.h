@@ -3,6 +3,7 @@
 //20/11/09
 
 #include <allegro.h>
+
 #include "stageInterface.h"
 #include "objectInterface.h"
 
@@ -11,11 +12,15 @@
 #define C_GREEN makecol(0, 255, 0)
 #define C_RED makecol(255, 0, 0)
 
-#define TARGET_SIZE 32
-
 using namespace objects;
 
 namespace stages {
+	#define PI 3.14159265
+	#define TARGET_SIZE 32
+	#define TURRET_X 60
+	#define TURRET_Y SCREEN_H - 60
+	#define TURRET_BASE_RADIUS 30
+	#define TURRET_BARREL_RADIUS 60
 
 	class stageInGame : public StageInterface {
 		private:
@@ -28,10 +33,14 @@ namespace stages {
 			double hudTargetMaxSpeed;
 			bool hudTargetLocked;
 
+			double hudTurretDirection;
+			double hudTurretTurnSpeed;
+
 			ObjectInterface *Asteroid;
 
 			void updateHud();
 			void drawHud(BITMAP *graphicsBuffer);
+			void drawTurret(BITMAP *graphicsBuffer);
 
 		public:
 			stageInGame();

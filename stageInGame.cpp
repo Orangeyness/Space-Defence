@@ -1,9 +1,14 @@
 #include <allegro.h>
+#include <math.h>
+
 #include "stageInGame.h"
 #include "objectAsteroid.h"
+#include "inputExtension.h"
+#include "stageInterface.h"
 
 using namespace stages;
 using namespace objects;
+using namespace inputExt;
 
 stageInGame::stageInGame() {
 	hudTargetX = SCREEN_W/2;
@@ -17,6 +22,8 @@ stageInGame::stageInGame() {
 
 	hudTargetLocked = false;
 
+	hudTurretDirection = 0;
+
 	Asteroid = new objAsteroid(SCREEN_W/2, SCREEN_H/2, 50, 20);
 	}
 
@@ -25,7 +32,7 @@ stageInGame::~stageInGame() {
 	}
 
 bool stageInGame::update() {
-	if (key[KEY_ESC]) return false;
+	if (keyboard::isKeyPressed(KEY_ESC)) return false;
 
 	Asteroid->update();
 
@@ -40,6 +47,7 @@ void stageInGame::draw(BITMAP *graphicsBuffer) {
 	Asteroid->draw(graphicsBuffer);
 
 	drawHud(graphicsBuffer);
+	drawTurret(graphicsBuffer);
 	}
 
 void stageInGame::updateHud() {
@@ -83,10 +91,12 @@ void stageInGame::updateHud() {
 		hudTargetYSpeed = 0;
 		}
 
-	if (key[KEY_SPACE]) hudTargetLocked =!hudTargetLocked;
+	if (keyboard::isKeyPressed(KEY_SPACE)) hudTargetLocked =!hudTargetLocked;
 
 	hudTargetX = (int)(hudTargetX + hudTargetXSpeed);
 	hudTargetY = (int)(hudTargetY + hudTargetYSpeed);
+
+	hudTurretDirection = atan2(hudTargetX - TURRET_X, -(TURRET_Y - hudTargetY));
 	}
 
 void stageInGame::drawHud(BITMAP *graphicsBuffer) {
@@ -103,4 +113,14 @@ void stageInGame::drawHud(BITMAP *graphicsBuffer) {
 	line(graphicsBuffer, hudTargetX - TARGET_SIZE/2, hudTargetY-TARGET_SIZE, hudTargetX + TARGET_SIZE/2, hudTargetY-TARGET_SIZE, Col);
 	line(graphicsBuffer, hudTargetX - TARGET_SIZE/2, hudTargetY+TARGET_SIZE, hudTargetX + TARGET_SIZE/2, hudTargetY+TARGET_SIZE, Col);
 
+	putpixel(graphicsBuffer, hudTargetX, hudTargetY, Col);
+	}
+
+void stageInGame::drawTurret(BITMAP *graphicsBuffer) {
+	circle(graphicsBuffer, TURRET_X, TURRET_Y, TURRET_BASE_RADIUS, C_GREEN);
+	int Dx = TURRET_X + (int)(TURRET_BARREL_RADIUS * sin(hudTurretDirection));
+	int Dy = TURRET_Y + (int)(TURRET_BARREL_RADIUS * cos(hudTurretDirection));
+
+	line(graphicsBuffer, TURRET_X, TURRET_Y, Dx, Dy, C_GREEN);
+	
 	}

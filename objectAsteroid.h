@@ -8,10 +8,9 @@
 #define MIN_POINT_COUNT 5
 
 #define ASTEROID_COLOR makecol(255, 10, 10)
-#define PI 3.14159265
 
 namespace objects {
-
+	#define PI 3.14159265
 	class objAsteroid : public ObjectInterface {
 		private:
 			int X;

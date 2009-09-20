@@ -15,8 +15,8 @@ objAsteroid::objAsteroid(int startX, int startY, int approxRadius, int randomnes
 	pointListY = new int[pointCount];
 		
 	for (int i = 0; i < pointCount; i++) {
-		pointListX[i] = (int)(radius * cos(2 * PI * ((double)i / (double)pointCount)) * ((100-randomness) + rand() % randomness)/100);
-		pointListY[i] = (int)(radius * sin(2 * PI * ((double)i / (double)pointCount)) * ((100-randomness) + rand() % randomness)/100); 
+		pointListX[i] = (int)(radius * sin(2 * PI * ((double)i / (double)pointCount)) * ((100-randomness) + rand() % randomness)/100);
+		pointListY[i] = (int)(radius * cos(2 * PI * ((double)i / (double)pointCount)) * ((100-randomness) + rand() % randomness)/100); 
 		}
 
 	radius = (int)(radius * (1-randomness/2));
