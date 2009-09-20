@@ -8,11 +8,11 @@
 #include <time.h>
 
 #include "stageInterface.h"
-#include "stageTest.h"
+#include "stageInGame.h"
 
 #define GFX_TYPE GFX_AUTODETECT_WINDOWED
-#define GFX_WIDTH 640
-#define GFX_HEIGHT 480
+#define GFX_WIDTH 800
+#define GFX_HEIGHT 600
 
 #define FPS_TARGET 30
 
@@ -36,7 +36,7 @@ int main(int argc, char * argv[]) {
 	bool gameRunning = true;
 	time_t gameStartTime = time (NULL);
 	BITMAP *gameGraphicsBuffer = create_bitmap(SCREEN_W, SCREEN_H);
-	StageInterface *gameCurrentStage = new stageTest();
+	StageInterface *gameCurrentStage = new stageInGame();
 
 	int frameDesiredRate = FPS_TARGET;
 	int frameDesiredLength = 1000/frameDesiredRate;
