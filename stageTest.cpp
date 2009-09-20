@@ -1,6 +1,8 @@
 #include <allegro.h>
 #include "stageTest.h"
 
+using namespace stages;
+
 stageTest::stageTest() {
 	updateCount = 0;
 	}

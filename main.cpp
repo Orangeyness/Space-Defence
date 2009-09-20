@@ -61,6 +61,7 @@ int main(int argc, char * argv[]) {
 			framePastThisSecond ++;
 			}
 		
+		blit(gameGraphicsBuffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 		gameCurrentStage->draw(gameGraphicsBuffer);
 
 		rest(1);
