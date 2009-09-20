@@ -1,8 +1,12 @@
 #include <allegro.h>
 #include <math.h>
+#include <time.h>
+
 
 #include "stageInGame.h"
 #include "objectAsteroid.h"
+#include "objectParticle.h"
+#include "objectBullet.h"
 #include "inputExtension.h"
 #include "stageInterface.h"
 #include "linkedLists.h"
@@ -26,32 +30,49 @@ stageInGame::stageInGame() {
 
 	hudTurretDirection = 0;
 
-	objBullet = NULL;
+	myBullet = NULL;
 	objListAsteroid.addFirst(new objAsteroid(100, 100, 50, 20, 0, 1));
 	objListAsteroid.addFirst(new objAsteroid(100, 200, 40, 20, 0, 1));
+
+	objListParticle.addFirst(new objParticle(100, 100, 1.0, 1.0, 10, 0, makecol(255, 10, 0), makecol(0, 0, 0), 0.5));
+
+	currentQuestion = "2 + 2 = ?";
+	currentAnswer = 5;
 	}
 
 stageInGame::~stageInGame() {
-	if (objBullet != NULL) delete objBullet;
+	if (myBullet != NULL) delete myBullet;
 	
 	while(objListAsteroid.nodeCount > 0) {
 		delete objListAsteroid.getFirstValue();	
+		objListAsteroid.getFirst()->remove();
 		}
 
 	while(objListParticle.nodeCount > 0) {
 		delete objListParticle.getFirstValue();	
+		objListParticle.getFirst()->remove();
 		}
 	}
 
 bool stageInGame::update() {
 	if (keyboard::isKeyPressed(KEY_ESC)) return false;
 
-	if (objBullet != NULL) objBullet->update();
+	if (myBullet != NULL) {
+		bool K = myBullet->update(&objListAsteroid, &objListParticle);
+		if (!K) {
+			delete myBullet;
+			myBullet = NULL;
+			}		
+		}
 
 	updateObjectList(objListAsteroid.getFirst());
 	updateObjectList(objListParticle.getFirst());
 
 	updateHud();
+
+	if ((keyboard::isKeyPressed(KEY_ENTER) || keyboard::isKeyPressed(KEY_ENTER_PAD)) && hudTargetLocked && myBullet == NULL) {
+		myBullet = new objBullet(TURRET_X, TURRET_Y, hudTargetX, hudTargetY, hudTurretDirection, 30);
+		}
 
 	return true;
 	}
@@ -59,7 +80,7 @@ bool stageInGame::update() {
 void stageInGame::draw(BITMAP *graphicsBuffer) {
 	clear_to_color(graphicsBuffer, C_BLACK);	
 
-	if (objBullet != NULL) objBullet->draw(graphicsBuffer);
+	if (myBullet != NULL) myBullet->draw(graphicsBuffer);
 
 	drawObjectList(objListAsteroid.getFirst(), graphicsBuffer);
 	drawObjectList(objListParticle.getFirst(), graphicsBuffer);
@@ -132,6 +153,7 @@ void stageInGame::drawHud(BITMAP *graphicsBuffer) {
 	line(graphicsBuffer, hudTargetX - TARGET_SIZE/2, hudTargetY+TARGET_SIZE, hudTargetX + TARGET_SIZE/2, hudTargetY+TARGET_SIZE, Col);
 
 	if (hudTargetLocked) {
+		textout_ex(graphicsBuffer, font, currentQuestion.c_str(), hudTargetX + TARGET_SIZE * 1.5, hudTargetY + 10, Col, -1);
 		}
 			else
 		{
@@ -152,8 +174,25 @@ void stageInGame::drawTurret(BITMAP *graphicsBuffer) {
 
 void stageInGame::updateObjectList(LinkedListNode<ObjectInterface*>* Node) {
 	while(Node != NULL) {
-		Node->getValue()->update();
+		ObjectInterface* obj = Node->getValue();
+		LinkedListNode<ObjectInterface*>* toDelete = NULL;
+
+		if (obj != NULL) {
+			bool keep = obj->update();
+			if (!keep) {
+				delete obj;
+				toDelete = Node;				
+				}
+			}
+				else
+			{
+			toDelete = Node;	
+			}
 		Node = Node->getNext();
+		
+		if (toDelete != NULL) {
+			toDelete->remove();			
+			}
 		}
 	}
 

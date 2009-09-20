@@ -30,9 +30,11 @@ objAsteroid::~objAsteroid() {
 	delete pointListY;
 	}
 
-void objAsteroid::update() {
+bool objAsteroid::update() {
 	X += Xspeed;
 	Y += Yspeed;
+
+	return true;
 	}
 
 void objAsteroid::draw(BITMAP *G) {

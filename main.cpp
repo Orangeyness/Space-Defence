@@ -1,7 +1,6 @@
 //REUBEN BELL
 //12:47 AM 20/11/2009
 //The entry point for the game, space defence.
-//Just messing with shit at the moment.
 
 #include <allegro.h>
 #include <stdlib.h>

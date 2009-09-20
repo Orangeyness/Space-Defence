@@ -21,7 +21,7 @@ namespace objects {
 
 	class ObjectInterface {
 		public:
-			virtual void update() = 0; //updates the object.
+			virtual bool update() = 0; //updates the object. false = delete object, true = keep object
 			virtual void draw(BITMAP *graphicsBuffer) = 0; //draws the object onto the given bitmap.
 		};
 	

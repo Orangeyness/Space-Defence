@@ -3,9 +3,11 @@
 //20/11/09
 
 #include <allegro.h>
+#include <string>
 
 #include "stageInterface.h"
 #include "objectInterface.h"
+#include "objectBullet.h"
 #include "linkedLists.h"
 
 #define C_WHITE makecol(255, 255, 255)
@@ -15,6 +17,7 @@
 
 using namespace objects;
 using namespace linkedLists;
+using namespace std;
 
 namespace stages {
 	#define PI 3.14159265
@@ -38,7 +41,10 @@ namespace stages {
 			double hudTurretDirection;
 			double hudTurretTurnSpeed;
 
-			ObjectInterface* objBullet;
+			string currentQuestion;
+			int currentAnswer;
+
+			objBullet* myBullet;
 			LinkedList<ObjectInterface*> objListAsteroid;
 			LinkedList<ObjectInterface*> objListParticle;
 

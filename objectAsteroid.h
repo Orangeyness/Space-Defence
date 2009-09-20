@@ -26,7 +26,7 @@ namespace objects {
 		public:
 			objAsteroid(int startX, int startY, int approxRadius, int randomness, int xSpeed, int ySpeed);
 			~objAsteroid();
-			virtual void update(); //updates the object.
+			virtual bool update(); //updates the object.
 			virtual void draw(BITMAP *graphicsBuffer); //draws the object onto the given bitmap.
 		};
 	
