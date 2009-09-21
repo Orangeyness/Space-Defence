@@ -11,6 +11,20 @@
 #include "stageInterface.h"
 #include "linkedLists.h"
 
+#define PI 3.14159265
+#define TARGET_SIZE 32
+#define TURRET_X 60
+#define TURRET_Y SCREEN_H - 60
+#define TURRET_BASE_RADIUS 30
+#define TURRET_BARREL_RADIUS 60
+
+#define INPUT_FILE "game.txt"
+
+#define C_WHITE makecol(255, 255, 255)
+#define C_BLACK makecol(0, 0, 0)
+#define C_GREEN makecol(0, 255, 0)
+#define C_RED makecol(255, 0, 0)
+
 using namespace stages;
 using namespace objects;
 using namespace inputExt;
@@ -31,13 +45,18 @@ stageInGame::stageInGame() {
 	hudTurretDirection = 0;
 
 	myBullet = NULL;
-	objListAsteroid.addFirst(new objAsteroid(100, 100, 50, 20, 0, 1));
-	objListAsteroid.addFirst(new objAsteroid(100, 200, 40, 20, 0, 1));
-
-	objListParticle.addFirst(new objParticle(100, 100, 1.0, 1.0, 10, 0, makecol(255, 10, 0), makecol(0, 0, 0), 0.5));
 
 	currentQuestion = "2 + 2 = ?";
 	currentAnswer = 5;
+
+	inputSpawnFile.open (INPUT_FILE);
+	inputSpawnSpeed = 2;
+	inputSpawnNext = clock() + inputSpawnSpeed * CLOCKS_PER_SEC;
+
+	gameLevel = 0;
+	drawLevel = false;
+	drawLevelEndTime = 0;
+	drawLevelLength = 2;
 	}
 
 stageInGame::~stageInGame() {
@@ -52,10 +71,17 @@ stageInGame::~stageInGame() {
 		delete objListParticle.getFirstValue();	
 		objListParticle.getFirst()->remove();
 		}
+
+	inputSpawnFile.close();
 	}
 
 bool stageInGame::update() {
 	if (keyboard::isKeyPressed(KEY_ESC)) return false;
+
+	if (clock() > inputSpawnNext) {
+		bool success = loadObjects();
+		if (!success) return false;		
+		}
 
 	if (myBullet != NULL) {
 		bool K = myBullet->update(&objListAsteroid, &objListParticle);
@@ -88,11 +114,82 @@ void stageInGame::draw(BITMAP *graphicsBuffer) {
 
 	textprintf_ex(graphicsBuffer, font, 10, 10, C_WHITE, -1, "Objects: %d", objListAsteroid.nodeCount);
 	textprintf_ex(graphicsBuffer, font, 10, 30, C_WHITE, -1, "Particles: %d", objListParticle.nodeCount);
-
-
+	textprintf_ex(graphicsBuffer, font, 10, 70, C_WHITE, -1, "LEVEL: %d!", gameLevel);
+	if (drawLevel) {
+		if (drawLevelEndTime < clock()) drawLevel = false;
+		textprintf_centre_ex(graphicsBuffer, font, SCREEN_W/2, SCREEN_H/2, C_GREEN, -1, "LEVEL: %d!", gameLevel);
+		}
 
 	drawHud(graphicsBuffer);
 	drawTurret(graphicsBuffer);
+	}
+
+bool stageInGame::loadObjects() {
+	if (inputSpawnFile.is_open() == false) {
+		allegro_message("Error: could not read input file. You better not have deleted it, mmmkay?");		
+		return false;		
+		}
+
+	if (inputSpawnFile.eof()) {
+		inputSpawnFile.close();
+		inputSpawnFile.open (INPUT_FILE);
+		}
+
+	string spawnLine;
+	getline(inputSpawnFile, spawnLine);
+	
+	bool delayNextSpawn = true;
+
+	for (unsigned int i = 0; i < spawnLine.length(); i++) {
+		switch(spawnLine[i]) {
+			case '1': {
+				objListAsteroid.addFirst(new objAsteroid(i * (SCREEN_W / spawnLine.length()), -10, 15 + rand() % 15, 20, 1-rand()%2, 1+rand()%1));
+				}break;
+			case '2': {
+				objListAsteroid.addFirst(new objAsteroid(i * (SCREEN_W / spawnLine.length()), -10, 30 + rand() % 15, 20, 1-rand()%2, 1+rand()%1));
+				}break;
+			case '3': {
+				objListAsteroid.addFirst(new objAsteroid(i * (SCREEN_W / spawnLine.length()), -10, 45 + rand() % 15, 20, 1-rand()%2, 1+rand()%1));
+				}break;
+			case '4': {
+				objListAsteroid.addFirst(new objAsteroid(i * (SCREEN_W / spawnLine.length()), -10, 60 + rand() % 15, 20, 1-rand()%2, 1+rand()%1));
+				}break;
+			case '5': {
+				objListAsteroid.addFirst(new objAsteroid(i * (SCREEN_W / spawnLine.length()), -10, 75 + rand() % 15, 20, 1-rand()%2, 1+rand()%1));
+				}break;
+			case '6': {
+				objListAsteroid.addFirst(new objAsteroid(i * (SCREEN_W / spawnLine.length()), -10, 90 + rand() % 15, 20, 1-rand()%2, 1+rand()%1));
+				}break;
+			case '7': {
+				objListAsteroid.addFirst(new objAsteroid(i * (SCREEN_W / spawnLine.length()), -10, 105 + rand() % 15, 20, 1-rand()%2, 1+rand()%1));
+				}break;
+			case '8': {
+				objListAsteroid.addFirst(new objAsteroid(i * (SCREEN_W / spawnLine.length()), -10, 120 + rand() % 15, 20, 1-rand()%2, 1+rand()%1));
+				}break;
+			case '9': {
+				objListAsteroid.addFirst(new objAsteroid(i * (SCREEN_W / spawnLine.length()), -10, 135 + rand() % 15, 20, 1-rand()%2, 1+rand()%1));
+				}break;
+
+
+			case 'S': {
+				if (i == 0 && spawnLine[i+1] == '-') inputSpawnSpeed += 0.2;
+				if (i == 0 && spawnLine[i+1] == '+') inputSpawnSpeed -= 0.2;
+				delayNextSpawn = false;
+				i = spawnLine.length();
+				}
+
+			case 'L': {
+				gameLevel ++;
+				drawLevel = true;
+				drawLevelEndTime = clock() + drawLevelLength * CLOCKS_PER_SEC;
+				i = spawnLine.length();
+				}
+			}		
+		}
+		
+
+	if (delayNextSpawn) inputSpawnNext = clock() + inputSpawnSpeed * CLOCKS_PER_SEC;
+	return true;
 	}
 
 void stageInGame::updateHud() {
@@ -144,6 +241,31 @@ void stageInGame::updateHud() {
 	hudTurretDirection = atan2(hudTargetX - TURRET_X, -(TURRET_Y - hudTargetY));
 	}
 
+void stageInGame::updateObjectList(LinkedListNode<ObjectInterface*>* Node) {
+	while(Node != NULL) {
+		ObjectInterface* obj = Node->getValue();
+		LinkedListNode<ObjectInterface*>* toDelete = NULL;
+
+		if (obj != NULL) {
+			bool keep = obj->update(&objListAsteroid, &objListParticle);
+			if (!keep) {
+				delete obj;
+				toDelete = Node;				
+				}
+			}
+				else
+			{
+			toDelete = Node;	
+			}
+		Node = Node->getNext();
+		
+		if (toDelete != NULL) {
+			toDelete->remove();			
+			}
+		}
+	}
+
+
 void stageInGame::drawHud(BITMAP *graphicsBuffer) {
 	int Col = C_GREEN;
 	if (hudTargetLocked == true) Col = C_RED;
@@ -176,30 +298,6 @@ void stageInGame::drawTurret(BITMAP *graphicsBuffer) {
 
 	line(graphicsBuffer, TURRET_X, TURRET_Y, Dx, Dy, C_GREEN);
 	
-	}
-
-void stageInGame::updateObjectList(LinkedListNode<ObjectInterface*>* Node) {
-	while(Node != NULL) {
-		ObjectInterface* obj = Node->getValue();
-		LinkedListNode<ObjectInterface*>* toDelete = NULL;
-
-		if (obj != NULL) {
-			bool keep = obj->update(&objListAsteroid, &objListParticle);
-			if (!keep) {
-				delete obj;
-				toDelete = Node;				
-				}
-			}
-				else
-			{
-			toDelete = Node;	
-			}
-		Node = Node->getNext();
-		
-		if (toDelete != NULL) {
-			toDelete->remove();			
-			}
-		}
 	}
 
 void stageInGame::drawObjectList(LinkedListNode<ObjectInterface*>* Node, BITMAP* graphicsBuffer) {
