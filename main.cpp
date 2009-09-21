@@ -24,6 +24,7 @@ using namespace inputExt;
 volatile int frameTickCount;
 void updateTicks();
 
+
 int main(int argc, char * argv[]) {
 	if (allegro_init() != 0) return EXIT_FAILURE;
 	
@@ -70,6 +71,7 @@ int main(int argc, char * argv[]) {
 		
 		blit(gameGraphicsBuffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 		gameCurrentStage->draw(gameGraphicsBuffer);
+		textprintf_ex(gameGraphicsBuffer, font, 10, 50, C_WHITE, -1, "Fps: %d", frameLastRate);
 
 		rest(1);
 		}

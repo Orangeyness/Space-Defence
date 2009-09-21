@@ -36,7 +36,7 @@ namespace objects {
 							int endColor,
 							double lifeSpan);
 			~objParticle();
-			virtual bool update(); //updates the object.
+			virtual bool update(LinkedList<ObjectInterface*> *Asteroids, LinkedList<ObjectInterface*> *Particles); //updates the object.
 			virtual void draw(BITMAP *graphicsBuffer); //draws the object onto the given bitmap.
 		};
 	

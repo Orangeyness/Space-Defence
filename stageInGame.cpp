@@ -71,7 +71,8 @@ bool stageInGame::update() {
 	updateHud();
 
 	if ((keyboard::isKeyPressed(KEY_ENTER) || keyboard::isKeyPressed(KEY_ENTER_PAD)) && hudTargetLocked && myBullet == NULL) {
-		myBullet = new objBullet(TURRET_X, TURRET_Y, hudTargetX, hudTargetY, hudTurretDirection, 30);
+		myBullet = new objBullet(TURRET_X, TURRET_Y, hudTargetX, hudTargetY, hudTurretDirection, 50);
+		hudTargetLocked = false;
 		}
 
 	return true;
@@ -84,6 +85,11 @@ void stageInGame::draw(BITMAP *graphicsBuffer) {
 
 	drawObjectList(objListAsteroid.getFirst(), graphicsBuffer);
 	drawObjectList(objListParticle.getFirst(), graphicsBuffer);
+
+	textprintf_ex(graphicsBuffer, font, 10, 10, C_WHITE, -1, "Objects: %d", objListAsteroid.nodeCount);
+	textprintf_ex(graphicsBuffer, font, 10, 30, C_WHITE, -1, "Particles: %d", objListParticle.nodeCount);
+
+
 
 	drawHud(graphicsBuffer);
 	drawTurret(graphicsBuffer);
@@ -178,7 +184,7 @@ void stageInGame::updateObjectList(LinkedListNode<ObjectInterface*>* Node) {
 		LinkedListNode<ObjectInterface*>* toDelete = NULL;
 
 		if (obj != NULL) {
-			bool keep = obj->update();
+			bool keep = obj->update(&objListAsteroid, &objListParticle);
 			if (!keep) {
 				delete obj;
 				toDelete = Node;				

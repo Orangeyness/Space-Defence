@@ -13,20 +13,23 @@ namespace objects {
 	#define PI 3.14159265
 	class objAsteroid : public ObjectInterface {
 		private:
-			int X;
-			int Y;
 			int pointCount;
 			int *pointListX;
 			int *pointListY;
-			int radius;
-
 			int Xspeed;
 			int Yspeed;
 
+			void spawnSmoke(int x, int y, LinkedList<ObjectInterface*> *Particles);
+
 		public:
+			int X;
+			int Y;
+			int Life;
+			int radius;
+
 			objAsteroid(int startX, int startY, int approxRadius, int randomness, int xSpeed, int ySpeed);
 			~objAsteroid();
-			virtual bool update(); //updates the object.
+			virtual bool update(LinkedList<ObjectInterface*> *Asteroids, LinkedList<ObjectInterface*> *Particles); 
 			virtual void draw(BITMAP *graphicsBuffer); //draws the object onto the given bitmap.
 		};
 	

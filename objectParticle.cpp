@@ -27,7 +27,7 @@ objParticle::objParticle(int startX, int startY, double xSpeed, double ySpeed, i
 
 objParticle::~objParticle() {}
 
-bool objParticle::update() {
+bool objParticle::update(LinkedList<ObjectInterface*>* Asteroids, LinkedList<ObjectInterface*>* Particles) {
 	X += Xspeed;
 	Y += Yspeed;
 	
