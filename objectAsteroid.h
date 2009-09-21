@@ -16,18 +16,18 @@ namespace objects {
 			int pointCount;
 			int *pointListX;
 			int *pointListY;
-			int Xspeed;
-			int Yspeed;
+			double Xspeed;
+			double Yspeed;
 
 			void spawnSmoke(int x, int y, LinkedList<ObjectInterface*> *Particles);
 
 		public:
-			int X;
-			int Y;
+			double X;
+			double Y;
 			int Life;
 			int radius;
 
-			objAsteroid(int startX, int startY, int approxRadius, int randomness, int xSpeed, int ySpeed);
+			objAsteroid(int startX, int startY, int approxRadius, int randomness, double xSpeed, double ySpeed);
 			~objAsteroid();
 			virtual bool update(LinkedList<ObjectInterface*> *Asteroids, LinkedList<ObjectInterface*> *Particles); 
 			virtual void draw(BITMAP *graphicsBuffer); //draws the object onto the given bitmap.

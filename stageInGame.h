@@ -32,20 +32,30 @@ namespace stages {
 			ifstream inputSpawnFile;
 			double inputSpawnSpeed;
 			clock_t inputSpawnNext;
+			double moveSpeed;
 			
+			int gameLife;
 			int gameLevel;
 			bool drawLevel;
 			clock_t drawLevelEndTime;
 			float drawLevelLength;
+			clock_t gamelevelStartTime;
 
+			int currentQuestionDifficuilty;
 			string currentQuestion;
+			string currentUserInput;
 			int currentAnswer;
+			bool currentQuestionFlickerOn;
+			clock_t currentQuestionFlickerNextChange;
+			double currentQuestionFlickerChangeDuration;
 
 			objBullet* myBullet;
 			LinkedList<ObjectInterface*> objListAsteroid;
 			LinkedList<ObjectInterface*> objListParticle;
 
 			bool loadObjects();
+			string updateUserInput(string Input);
+			void generateQuestion();
 			void updateHud();
 			void updateObjectList(LinkedListNode<ObjectInterface*>* Node);
 			void drawHud(BITMAP *graphicsBuffer);

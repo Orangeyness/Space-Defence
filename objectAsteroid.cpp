@@ -6,7 +6,7 @@
 
 using namespace objects;
 
-objAsteroid::objAsteroid(int startX, int startY, int approxRadius, int randomness, int xSpeed, int ySpeed) {
+objAsteroid::objAsteroid(int startX, int startY, int approxRadius, int randomness, double xSpeed, double ySpeed) {
 	X = startX;
 	Y = startY;
 	radius = approxRadius;
@@ -26,6 +26,13 @@ objAsteroid::objAsteroid(int startX, int startY, int approxRadius, int randomnes
 
 	Xspeed = xSpeed;
 	Yspeed = ySpeed;
+
+	int time = SCREEN_H/Yspeed;
+	int Count = 0;
+	while ((X + Xspeed * time < 0 || X + Xspeed * time > SCREEN_W) && Count < 100) {
+		Xspeed -= Xspeed/4; 
+		Count ++;
+		}
 	}
 
 objAsteroid::~objAsteroid() {
@@ -39,7 +46,7 @@ bool objAsteroid::update(LinkedList<ObjectInterface*> *Asteroids, LinkedList<Obj
 
 	if (Life < 0) {
 		for (int i = 0; i < rand() % 50; i++) {
-			spawnSmoke(X + rand()%radius - rand()%radius, Y + rand()%radius - rand()%radius, Particles);
+			spawnSmoke((int)X + rand()%radius - rand()%radius, (int)Y + rand()%radius - rand()%radius, Particles);
 			}
 		
 		return false;
@@ -50,11 +57,9 @@ bool objAsteroid::update(LinkedList<ObjectInterface*> *Asteroids, LinkedList<Obj
 
 void objAsteroid::draw(BITMAP *G) {
 	for (int i = 1; i < pointCount; i++) {
-		line(G, X + pointListX[i-1], Y + pointListY[i-1], X + pointListX[i], Y + pointListY[i], ASTEROID_COLOR);
+		line(G, (int)X + pointListX[i-1], (int)Y + pointListY[i-1], (int)X + pointListX[i], (int)Y + pointListY[i], ASTEROID_COLOR);
 		}
-	line(G, X + pointListX[0], Y + pointListY[0], X + pointListX[pointCount-1], Y + pointListY[pointCount-1], ASTEROID_COLOR);
-
-	textprintf_ex(G, font, X + 30, Y + 30, makecol(255, 255, 255), -1, "%d - %d", Life, radius);
+	line(G, (int)X + pointListX[0], (int)Y + pointListY[0], (int)X + pointListX[pointCount-1], (int)Y + pointListY[pointCount-1], ASTEROID_COLOR);
 	}
 
 void objAsteroid::spawnSmoke(int X, int Y, LinkedList<ObjectInterface*>* Particles) {
