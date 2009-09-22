@@ -7,6 +7,7 @@
 #include "stageInGame.h"
 #include "stageInGameMenu.h"
 #include "stagePauseMenu.h"
+#include "stageGameOver.h"
 #include "objectAsteroid.h"
 #include "objectParticle.h"
 #include "objectBullet.h"
@@ -168,6 +169,12 @@ bool stageInGame::update() {
 			generateQuestion(); 
 			}
 		currentUserInput = "";
+		}
+
+	if (gameLife <= 0) {
+		rest(200);
+		globalData::gameCurrentStage = new stageGameOver(gameScore);	
+		return STAGE_OVER;	
 		}
 
 	return STAGE_RUNNING;
