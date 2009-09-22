@@ -187,7 +187,7 @@ string stageGameOver::updateUserInput(string Input) {
 		if (keyboard::isKeyPressed(i)) {
 			int asciiNumStart = 96;
 			if (key[KEY_LSHIFT] || key[KEY_RSHIFT]) asciiNumStart = 64;
-			if (i > 26) asciiNumStart = 22;
+			if (i > 26) asciiNumStart = 21;
 			Input += (char)(i + asciiNumStart);	
 			i = 37;		
 			}
