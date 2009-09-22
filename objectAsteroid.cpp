@@ -44,9 +44,11 @@ bool objAsteroid::update(LinkedList<ObjectInterface*> *Asteroids, LinkedList<Obj
 	X += Xspeed;
 	Y += Yspeed;
 
+	if (Y > SCREEN_H + 100) Life = 0;
+
 	if (Life < 0) {
 		for (int i = 0; i < rand() % 50; i++) {
-			spawnSmoke((int)X + rand()%radius - rand()%radius, (int)Y + rand()%radius - rand()%radius, Particles);
+			if (Particles != NULL) spawnSmoke((int)X + rand()%radius - rand()%radius, (int)Y + rand()%radius - rand()%radius, Particles);
 			}
 		
 		return false;

@@ -6,13 +6,14 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "global.h"
 #include "stageInterface.h"
-#include "stageInGame.h"
+#include "stageOpeningMenu.h"
 #include "inputExtension.h"
 
-#define GFX_TYPE GFX_AUTODETECT_WINDOWED
-#define GFX_WIDTH 1024
-#define GFX_HEIGHT 768
+#define DEFUALT_GFX_FULLSCREEN false
+#define DEFUALT_GFX_WIDTH 1024
+#define DEFUALT_GFX_HEIGHT 768
 
 #define FPS_TARGET 30
 
@@ -20,9 +21,11 @@
 
 using namespace stages;
 using namespace inputExt;
+using namespace global;
 
 volatile int frameTickCount;
 void updateTicks();
+
 
 
 int main(int argc, char * argv[]) {
@@ -35,49 +38,65 @@ int main(int argc, char * argv[]) {
 	LOCK_VARIABLE(frameTickCount);
 	LOCK_FUNCTION(updateTicks);
 
-	set_gfx_mode(GFX_TYPE, GFX_WIDTH, GFX_HEIGHT, 0, 0);
+
+	globalData::gameResolutionX = DEFUALT_GFX_WIDTH;
+	globalData::gameResolutionY = DEFUALT_GFX_HEIGHT;
+	globalData::gameFullScreen = DEFUALT_GFX_FULLSCREEN;
+
+	if (globalData::gameFullScreen) 
+		set_gfx_mode(GFX_AUTODETECT_FULLSCREEN, globalData::gameResolutionX, globalData::gameResolutionY, 0, 0);
+	else
+		set_gfx_mode(GFX_AUTODETECT_WINDOWED, globalData::gameResolutionX, globalData::gameResolutionY, 0, 0);
+
+	globalData::gameStartTime = time (NULL);
+	globalData::gameGraphicsBuffer = create_bitmap(SCREEN_W, SCREEN_H);
+	globalData::gameCurrentStage = new stageOpeningMenu();
 
 	srand(time(NULL));
 
-	bool gameRunning = true;
-	time_t gameStartTime = time (NULL);
-	BITMAP *gameGraphicsBuffer = create_bitmap(SCREEN_W, SCREEN_H);
-	StageInterface *gameCurrentStage = new stageInGame();
+
 
 	int frameDesiredRate = FPS_TARGET;
 	int frameDesiredLength = 1000/frameDesiredRate;
 	int frameLastRate = frameDesiredRate;
 	int framePastThisSecond = 0;
-	time_t frameSecondStartTime = gameStartTime;
+	time_t frameSecondStartTime = globalData::gameStartTime;
 
 	install_int(updateTicks, frameDesiredLength);
 
-	while(gameRunning) {
+	while(globalData::isGameRunning() == true) {
 		if (difftime(time(NULL), frameSecondStartTime) >= 1) {
 			frameLastRate = framePastThisSecond;
 			framePastThisSecond = 0;
 			frameSecondStartTime = time(NULL);
 			}
 
-		while (frameTickCount > 0 && gameRunning) {
+		while (frameTickCount > 0 && globalData::isGameRunning() == true) {
 			frameTickCount --;
 			
 			keyboard::update();
-
-			gameRunning = gameCurrentStage->update();
-
+			
+			StageInterface *stage = globalData::gameCurrentStage;
+			bool stageState = stage->update();
+			if (stageState == STAGE_OVER) {
+				if (globalData::gameCurrentStage == stage) globalData::gameCurrentStage = NULL;
+				delete stage;
+				}				
 			framePastThisSecond ++;
 			}
 		
-		blit(gameGraphicsBuffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
-		gameCurrentStage->draw(gameGraphicsBuffer);
-		textprintf_ex(gameGraphicsBuffer, font, 10, 50, makecol(255, 255, 255), -1, "Fps: %d", frameLastRate);
+		if (globalData::isGameRunning() == true) {
+			blit(globalData::gameGraphicsBuffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+			globalData::gameCurrentStage->draw(globalData::gameGraphicsBuffer);
+			textprintf_ex(globalData::gameGraphicsBuffer, font, 10, 50, makecol(255, 255, 255), -1, "Fps: %d", frameLastRate);
+			textprintf_ex(globalData::gameGraphicsBuffer, font, 80, 50, makecol(255, 255, 255), -1, "Pressed: %d", (int)keyboard::isKeyPressed(KEY_P));
+			}
 
 		rest(1);
 		}
 
-	delete gameCurrentStage;
-	destroy_bitmap(gameGraphicsBuffer);
+	if (globalData::gameCurrentStage == NULL) delete globalData::gameCurrentStage;
+	destroy_bitmap(globalData::gameGraphicsBuffer);
 	
 
 	return EXIT_SUCCESS;

@@ -39,7 +39,8 @@ namespace stages {
 			bool drawLevel;
 			clock_t drawLevelEndTime;
 			float drawLevelLength;
-			clock_t gamelevelStartTime;
+			clock_t gameLevelScoreUpdate;
+			unsigned int gameScore;
 
 			int currentQuestionDifficuilty;
 			string currentQuestion;
@@ -52,6 +53,8 @@ namespace stages {
 			objBullet* myBullet;
 			LinkedList<ObjectInterface*> objListAsteroid;
 			LinkedList<ObjectInterface*> objListParticle;
+
+			int drawDamage;
 
 			bool loadObjects();
 			string updateUserInput(string Input);
@@ -67,6 +70,8 @@ namespace stages {
 			~stageInGame();
 			virtual bool update();
 			virtual void draw(BITMAP *graphicsBuffer);
+			virtual void pause();
+			virtual void resume();
 		};
 	
 	}

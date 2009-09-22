@@ -4,14 +4,16 @@
 #include <string>
 #include <sstream>
 
-
 #include "stageInGame.h"
+#include "stageInGameMenu.h"
+#include "stagePauseMenu.h"
 #include "objectAsteroid.h"
 #include "objectParticle.h"
 #include "objectBullet.h"
 #include "inputExtension.h"
 #include "stageInterface.h"
 #include "linkedLists.h"
+#include "global.h"
 
 #define PI 3.14159265
 #define TARGET_SIZE 32
@@ -32,6 +34,7 @@ using namespace stages;
 using namespace objects;
 using namespace inputExt;
 using namespace linkedLists;
+using namespace global;
 
 stageInGame::stageInGame() {
 	hudTargetX = SCREEN_W/2;
@@ -67,7 +70,10 @@ stageInGame::stageInGame() {
 	drawLevel = false;
 	drawLevelEndTime = 0;
 	drawLevelLength = 2;
-	gamelevelStartTime = time(NULL);
+	gameLevelScoreUpdate = time(NULL);
+	gameScore = 0;
+
+	drawDamage = 0;
 	}
 
 stageInGame::~stageInGame() {
@@ -87,11 +93,23 @@ stageInGame::~stageInGame() {
 	}
 
 bool stageInGame::update() {
-	if (keyboard::isKeyPressed(KEY_ESC)) return false;
+	if (keyboard::isKeyPressed(KEY_ESC)) {
+		BITMAP *preview = create_bitmap(SCREEN_W, SCREEN_H);
+		draw(preview);
+		globalData::gameCurrentStage = new stageInGameMenu(this, preview);
+
+		return STAGE_RUNNING;
+		}
+	if (keyboard::isKeyPressed(KEY_P)) {
+		BITMAP *preview = create_bitmap(SCREEN_W, SCREEN_H);
+		draw(preview);
+		globalData::gameCurrentStage = new stagePauseMenu(this, preview);
+		return STAGE_RUNNING;		
+		}
 
 	if (clock() > inputSpawnNext) {
 		bool success = loadObjects();
-		if (!success) return false;		
+		if (!success) return STAGE_OVER;		
 		}
 
 	if (myBullet != NULL) {
@@ -100,6 +118,11 @@ bool stageInGame::update() {
 			delete myBullet;
 			myBullet = NULL;
 			}		
+		}
+
+	if (gameLevelScoreUpdate < time(NULL)) {
+		gameScore ++;
+		gameLevelScoreUpdate = time(NULL);		
 		}
 
 	updateObjectList(objListAsteroid.getFirst());
@@ -116,6 +139,7 @@ bool stageInGame::update() {
 		if (obj->Y > BASE_Y_COORDINATE) {
 			gameLife -= obj->Life/2;
 			obj->Life = -1;
+			drawDamage = 5;
 			} 
 
 		Node = Node->getNext();
@@ -146,10 +170,11 @@ bool stageInGame::update() {
 		currentUserInput = "";
 		}
 
-	return true;
+	return STAGE_RUNNING;
 	}
 
 void stageInGame::draw(BITMAP *graphicsBuffer) {
+	if (drawDamage) { drawDamage --; clear_to_color(graphicsBuffer, C_RED); return; }
 	clear_to_color(graphicsBuffer, C_BLACK);	
 
 	if (myBullet != NULL) myBullet->draw(graphicsBuffer);
@@ -161,7 +186,7 @@ void stageInGame::draw(BITMAP *graphicsBuffer) {
 	textprintf_ex(graphicsBuffer, font, 10, 30, C_WHITE, -1, "Particles: %d", objListParticle.nodeCount);
 	textprintf_ex(graphicsBuffer, font, 10, 70, C_WHITE, -1, "LEVEL: %d!", gameLevel);
 	textprintf_ex(graphicsBuffer, font, 10, 90, C_WHITE, -1, "Life: %d!", gameLife);
-	textprintf_ex(graphicsBuffer, font, 10, 120, C_WHITE, -1, "Score: %ld!", time(NULL) - gamelevelStartTime);
+	textprintf_ex(graphicsBuffer, font, 10, 110, C_WHITE, -1, "Score: %d!", gameScore);
 
 	drawHud(graphicsBuffer);
 	drawTurret(graphicsBuffer);
@@ -530,10 +555,10 @@ void stageInGame::drawHud(BITMAP *graphicsBuffer) {
 	line(graphicsBuffer, hudTargetX - TARGET_SIZE/2, hudTargetY-TARGET_SIZE, hudTargetX + TARGET_SIZE/2, hudTargetY-TARGET_SIZE, Col);
 	line(graphicsBuffer, hudTargetX - TARGET_SIZE/2, hudTargetY+TARGET_SIZE, hudTargetX + TARGET_SIZE/2, hudTargetY+TARGET_SIZE, Col);
 
-	line(graphicsBuffer, 0, BASE_Y_COORDINATE, SCREEN_W, BASE_Y_COORDINATE, Col);
+	line(graphicsBuffer, 0, BASE_Y_COORDINATE, SCREEN_W, BASE_Y_COORDINATE, C_GREEN);
 
 	int XX = hudTargetX + TARGET_SIZE * 1.5;
-	if (XX > SCREEN_W - TARGET_SIZE) XX = hudTargetX - TARGET_SIZE * 5;
+	if (XX > SCREEN_W - TARGET_SIZE * 3) XX = hudTargetX - TARGET_SIZE * 5;
 	if (hudTargetLocked) {
 		textout_ex(graphicsBuffer, font, currentQuestion.c_str(), XX, hudTargetY + 10, Col, -1);
 		if (currentUserInput != "") {
@@ -573,3 +598,10 @@ void stageInGame::drawObjectList(LinkedListNode<ObjectInterface*>* Node, BITMAP*
 		Node = Node->getNext();
 		}
 	}
+
+void stageInGame::pause() {
+	}
+
+void stageInGame::resume() {
+	}
+
