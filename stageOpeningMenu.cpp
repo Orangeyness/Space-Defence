@@ -5,6 +5,7 @@
 #include "stageOptionsMenu.h"
 #include "stageInGame.h"
 #include "stageHighScores.h"
+#include "stageAboutGame.h"
 
 #include "objectInterface.h"
 #include "objectAsteroid.h"
@@ -84,6 +85,11 @@ bool stageOpeningMenu::update() {
 
 	if (((keyboard::isKeyPressed(KEY_ENTER) || keyboard::isKeyPressed(KEY_ENTER_PAD)) && bntNewGame->Selected)) {
 		globalData::gameCurrentStage = new stageInGame();
+		return STAGE_OVER;		
+		}
+
+	if (((keyboard::isKeyPressed(KEY_ENTER) || keyboard::isKeyPressed(KEY_ENTER_PAD)) && bntAbout->Selected)) {
+		globalData::gameCurrentStage = new stageAboutGame();
 		return STAGE_OVER;		
 		}
 

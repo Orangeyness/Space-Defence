@@ -91,6 +91,7 @@ void stageHighScores::draw(BITMAP *graphicsBuffer) {
 
 	drawObjectList(objListAsteroid.getFirst(), graphicsBuffer);
 
+	int ys = 250;
 	if (globalData::gameResolutionX > 1000) { 
 		int txtHeight = text_height(font);
 		int txtWidth = text_length(font, "                                                                                                           ");
@@ -114,19 +115,21 @@ void stageHighScores::draw(BITMAP *graphicsBuffer) {
 		textout_ex(graphicsBuffer, font, "| |__| |_  __ _| |__   | (___   ___ ___  _ __ ___  ___ ", xx, yy + txtHeight * 2, C_GREEN, -1);
 		textout_ex(graphicsBuffer, font, "|  __  | |/ _` | '_ \\   \\___ \\ / __/ _ \\| '__/ _ \\/ __|", xx, yy + txtHeight * 3, C_GREEN, -1);
 		textout_ex(graphicsBuffer, font, "| |  | | | (_| | | | |  ____) | (_| (_) | | |  __/\\__ \\", xx, yy + txtHeight * 4, C_GREEN, -1);
-		textout_ex(graphicsBuffer, font, "|_|  |_|_|\\__, |_| |_| |_____/ \\___\\___/|_|  \\___||___/", xx, yy + txtHeight * 5, C_GREEN, -1);
-		textout_ex(graphicsBuffer, font, "		     __/ |                                        ", xx, yy + txtHeight * 6, C_GREEN, -1);
-		textout_ex(graphicsBuffer, font, "		    |___/                                         ", xx, yy + txtHeight * 7, C_GREEN, -1);
+		textout_ex(graphicsBuffer, font, "|_|  |_|_|\\___,|_| |_| |_____/ \\___\\___/|_|  \\___||___/", xx, yy + txtHeight * 5, C_GREEN, -1);
+		textout_ex(graphicsBuffer, font, "          __/ |                                        ", xx, yy + txtHeight * 6, C_GREEN, -1);
+		textout_ex(graphicsBuffer, font, "         |___/                                         ", xx, yy + txtHeight * 7, C_GREEN, -1);
+		ys = 150;
 		}
 
 	int x1 = 100;
 	int x2 = SCREEN_W - 100;
-	int ys = 250;
 	int yinc = 25;
 	for(int i = 0; i < HIGH_SCORE_COUNT; i++) {
-		textout_ex(graphicsBuffer, font, highScoreNames[i].c_str(), x1, ys + yinc*i, C_GREEN, -1);
-		textprintf_right_ex(graphicsBuffer, font, x2, ys + yinc*i, C_GREEN, -1, "%d", highScores[i]);
-		line(graphicsBuffer, x1, ys + yinc * (i + 1) - 15, x2, ys + yinc * (i + 1) - 15, C_GREEN);
+		if (ys + yinc * (i + 1) - 15 < SCREEN_H - 100) {
+			textout_ex(graphicsBuffer, font, highScoreNames[i].c_str(), x1, ys + yinc*i, C_GREEN, -1);
+			textprintf_right_ex(graphicsBuffer, font, x2, ys + yinc*i, C_GREEN, -1, "%d", highScores[i]);
+			line(graphicsBuffer, x1, ys + yinc * (i + 1) - 15, x2, ys + yinc * (i + 1) - 15, C_GREEN);
+			}
 		}
 
 	bntBack->draw(graphicsBuffer);

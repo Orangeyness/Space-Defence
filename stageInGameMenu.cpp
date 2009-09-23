@@ -2,6 +2,7 @@
 #include "stageOpeningMenu.h"
 #include "stageInGameMenu.h"
 #include "stageOptionsMenu.h"
+#include "stageInGame.h"
 #include "stageInterface.h"
 #include "inputExtension.h"
 #include "global.h"
@@ -63,6 +64,7 @@ bool stageInGameMenu::update() {
 	bntExit->update();
 	
 	if (((keyboard::isKeyPressed(KEY_ENTER) || keyboard::isKeyPressed(KEY_ENTER_PAD)) && bntResume->Selected) || keyboard::isKeyPressed(KEY_ESC)) {
+		if (bntExit->Selected) ((stageInGame*)rtnStage)->gameLife += 100;		
 		rtnStage->resume();
 				
 		globalData::gameCurrentStage = rtnStage;

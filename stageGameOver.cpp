@@ -11,6 +11,7 @@
 
 #include "objectInterface.h"
 #include "objectAsteroid.h"
+#include "objectParticle.h"
 
 #include "menuButton.h"
 #include "global.h"
@@ -21,6 +22,10 @@
 #define C_BLACK makecol(0, 0, 0)
 #define C_GREEN makecol(0, 255, 0)
 
+#define BASE_Y_COORDINATE SCREEN_H - 60
+#define TURRET_X 60
+#define TURRET_Y SCREEN_H - 30
+
 using namespace menu;
 using namespace objects;
 using namespace stages;
@@ -28,7 +33,7 @@ using namespace global;
 using namespace inputExt;
 using namespace linkedLists;
 
-stageGameOver::stageGameOver(int S) {
+stageGameOver::stageGameOver(LinkedList<ObjectInterface*>* Asteroids, LinkedList<ObjectInterface*>* Particles, int S) {
 
 	score = S;
 	bntSubmit = new Button(50, SCREEN_H - 80, 200, 40, "Back to Menu");
@@ -36,6 +41,15 @@ stageGameOver::stageGameOver(int S) {
 	userInput = "";	
 	
 	highScore = false;
+
+	objListAsteroid = Asteroids;
+	objListParticle = Particles;
+
+	int ExplosionCount = 10 + rand() % 50;
+	for (int i = 0; i <ExplosionCount; i++) {
+		spawnExplosion(Particles, rand() % SCREEN_W, BASE_Y_COORDINATE + rand() % (SCREEN_H - BASE_Y_COORDINATE));
+		}
+	spawnExplosion(Particles, TURRET_X, TURRET_Y);
 
 	for (int i = 0; i < HIGH_SCORE_COUNT; i++) {
 		highScoreNames[i] = "";
@@ -69,10 +83,18 @@ stageGameOver::stageGameOver(int S) {
 stageGameOver::~stageGameOver() {
 	delete bntSubmit;
 
-	while(objListAsteroid.nodeCount > 0) {
-		delete objListAsteroid.getFirstValue();	
-		objListAsteroid.getFirst()->remove();
+	while(objListAsteroid->nodeCount > 0) {
+		delete objListAsteroid->getFirstValue();	
+		objListAsteroid->getFirst()->remove();
 		}
+
+	while(objListParticle->nodeCount > 0) {
+		delete objListParticle->getFirstValue();	
+		objListParticle->getFirst()->remove();
+		}
+
+	delete objListAsteroid;
+	delete objListParticle;
 	}
 
 bool stageGameOver::update() {
@@ -82,10 +104,11 @@ bool stageGameOver::update() {
 	bntSubmit->update();
 
 	if (rand() % 100 == 50) {
-		objListAsteroid.addLast(new objAsteroid(40 + rand() % SCREEN_W - 80, -100, 10 + rand() % 40, 40, (20-rand()%40)/10, 1 + (rand() % 20)/10));
+		objListAsteroid->addLast(new objAsteroid(40 + rand() % SCREEN_W - 80, -100, 10 + rand() % 40, 40, (20-rand()%40)/10, 1 + (rand() % 20)/10));
 		}
 
-	updateObjectList(objListAsteroid.getFirst());
+	updateObjectList(objListAsteroid->getFirst());
+	updateObjectList(objListParticle->getFirst());
 
 	if (((keyboard::isKeyPressed(KEY_ENTER) || keyboard::isKeyPressed(KEY_ENTER_PAD)) && bntSubmit->Selected) || keyboard::isKeyPressed(KEY_ESC)) {
 		if (highScore) {
@@ -136,7 +159,8 @@ bool stageGameOver::update() {
 void stageGameOver::draw(BITMAP *graphicsBuffer) {
 	clear_to_color(graphicsBuffer, C_BLACK);
 
-	drawObjectList(objListAsteroid.getFirst(), graphicsBuffer);
+	drawObjectList(objListAsteroid->getFirst(), graphicsBuffer);
+	drawObjectList(objListParticle->getFirst(), graphicsBuffer);
 
 	if (globalData::gameResolutionX > 1000) { 
 		int txtHeight = text_height(font);
@@ -181,8 +205,6 @@ void stageGameOver::resume() {}
 void stageGameOver::pause() {}
 
 string stageGameOver::updateUserInput(string Input) {
-	
-	
 	for (int i = 0; i < 37; i++) {
 		if (keyboard::isKeyPressed(i)) {
 			int asciiNumStart = 96;
@@ -219,7 +241,7 @@ void stageGameOver::updateObjectList(LinkedListNode<ObjectInterface*>* Node) {
 		LinkedListNode<ObjectInterface*>* toDelete = NULL;
 
 		if (obj != NULL) {
-			bool keep = obj->update(&objListAsteroid, NULL);
+			bool keep = obj->update(objListAsteroid, NULL);
 			if (!keep) {
 				delete obj;
 				toDelete = Node;				
@@ -234,5 +256,44 @@ void stageGameOver::updateObjectList(LinkedListNode<ObjectInterface*>* Node) {
 		if (toDelete != NULL) {
 			toDelete->remove();			
 			}
+		}
+	}
+
+void stageGameOver::spawnExplosion(LinkedList<ObjectInterface*>* Particles, int X, int Y) {
+	spawnFire(Particles, X, Y);
+	spawnSmoke(Particles, X, Y);
+	}
+
+void stageGameOver::spawnSmoke(LinkedList<ObjectInterface*>* Particles, int X, int Y) {
+	int cloudCount = 20 + rand() % 20;
+	for (int i = 0; i < cloudCount; i++) {
+		double xSpeed = (-(rand() % 30) + rand() % 30)/10;
+		double ySpeed = (-(rand() % 30) + rand() % 30)/10;				
+		int startColor = makecol(200 + (rand() %10), 100 + (rand() %10), 100 + (rand() %10));
+		int endColor = makecol(50 - (rand() %5), 50 - (rand() %5), 50 - (rand() %5));
+		int startSize = 1 + rand() % 10;
+		int endSize = 1 + rand() % 20;
+		double lifeSpan = 0.7 + (rand() % 40)/100;
+		
+		Particles->addFirst(new objParticle(X + rand()%5 - rand()%5, Y + rand()%5 - rand()%5, xSpeed, ySpeed, startSize, endSize, startColor, endColor, lifeSpan));
+		}
+	}
+
+void stageGameOver::spawnFire(LinkedList<ObjectInterface*>* Particles, int X, int Y) {
+	int fireCount = rand() % 100;
+	for (int i = 0; i < fireCount; i++) {
+		int xSpeed = 1 + rand()%11;
+		int ySpeed = 1 + rand()%11;
+		
+		if (rand() % 2 == 1) xSpeed =- xSpeed;
+		if (rand() % 2 == 1) ySpeed =- ySpeed;
+		
+		int startColor = makecol(255 - rand()%100, rand()%60, rand()%60);
+		int endColor = makecol(10, 10, 10);
+		int startSize = 2 + rand()%3;
+		int endSize = 1;
+		double lifeSpan = 1 + (rand()%70)/100;
+
+		Particles->addLast(new objParticle(X, Y, xSpeed, ySpeed, startSize, endSize, startColor, endColor, lifeSpan));
 		}
 	}

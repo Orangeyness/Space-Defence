@@ -27,17 +27,21 @@ Button::~Button() {
 
 void Button::update() {
 	if (Selected) {
-		if ((keyboard::isKeyPressed(KEY_DOWN) || keyboard::isKeyPressed(KEY_S)) && Next != NULL) {
+		if ((keyboard::isKeyPressed(KEY_DOWN) || keyboard::isKeyPressed(KEY_RIGHT) || keyboard::isKeyPressed(KEY_S) || keyboard::isKeyPressed(KEY_D)) && Next != NULL) {
 			Next->Selected = true;
 			Selected = false;		
 			keyboard::clearKey(KEY_DOWN);	
+			keyboard::clearKey(KEY_RIGHT);
+			keyboard::clearKey(KEY_D);
 			keyboard::clearKey(KEY_S);
 			}
-		if ((keyboard::isKeyPressed(KEY_UP) || keyboard::isKeyPressed(KEY_W)) && Prev != NULL) {
+		if ((keyboard::isKeyPressed(KEY_UP) || keyboard::isKeyPressed(KEY_LEFT) || keyboard::isKeyPressed(KEY_W) || keyboard::isKeyPressed(KEY_A)) && Prev != NULL) {
 			Prev->Selected = true;
 			Selected = false;			
 			keyboard::clearKey(KEY_UP);
+			keyboard::clearKey(KEY_LEFT);
 			keyboard::clearKey(KEY_W);
+			keyboard::clearKey(KEY_A);
 			}
 		}	
 	}

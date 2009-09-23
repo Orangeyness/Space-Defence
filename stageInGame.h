@@ -34,7 +34,6 @@ namespace stages {
 			clock_t inputSpawnNext;
 			double moveSpeed;
 			
-			int gameLife;
 			int gameLevel;
 			bool drawLevel;
 			clock_t drawLevelEndTime;
@@ -66,6 +65,8 @@ namespace stages {
 			void drawObjectList(LinkedListNode<ObjectInterface*>* Node, BITMAP *graphicsBuffer);
 
 		public:
+			int gameLife;
+
 			stageInGame();
 			~stageInGame();
 			virtual bool update();

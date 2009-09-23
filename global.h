@@ -19,6 +19,9 @@ namespace global {
 			static bool gameFullScreen;
 
 			static bool isGameRunning();
+			static void write();
+			static void read();
+			static void failSafe();
 		};	
 	}
 

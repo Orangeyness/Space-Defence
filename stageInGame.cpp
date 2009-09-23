@@ -172,8 +172,21 @@ bool stageInGame::update() {
 		}
 
 	if (gameLife <= 0) {
-		rest(200);
-		globalData::gameCurrentStage = new stageGameOver(gameScore);	
+
+		LinkedList<ObjectInterface*>* asteroidCopy = new LinkedList<ObjectInterface*>();
+		LinkedList<ObjectInterface*>* particleCopy = new LinkedList<ObjectInterface*>();
+
+		while(objListAsteroid.nodeCount > 0) {
+			asteroidCopy->addLast(objListAsteroid.getFirstValue());	
+			objListAsteroid.getFirst()->remove();
+			}
+	
+		while(objListParticle.nodeCount > 0) {
+			particleCopy->addLast(objListParticle.getFirstValue());	
+			objListParticle.getFirst()->remove();
+			}
+
+		globalData::gameCurrentStage = new stageGameOver(asteroidCopy, particleCopy, gameScore);	
 		return STAGE_OVER;	
 		}
 
@@ -188,12 +201,6 @@ void stageInGame::draw(BITMAP *graphicsBuffer) {
 
 	drawObjectList(objListAsteroid.getFirst(), graphicsBuffer);
 	drawObjectList(objListParticle.getFirst(), graphicsBuffer);
-
-	textprintf_ex(graphicsBuffer, font, 10, 10, C_WHITE, -1, "Objects: %d", objListAsteroid.nodeCount);
-	textprintf_ex(graphicsBuffer, font, 10, 30, C_WHITE, -1, "Particles: %d", objListParticle.nodeCount);
-	textprintf_ex(graphicsBuffer, font, 10, 70, C_WHITE, -1, "LEVEL: %d!", gameLevel);
-	textprintf_ex(graphicsBuffer, font, 10, 90, C_WHITE, -1, "Life: %d!", gameLife);
-	textprintf_ex(graphicsBuffer, font, 10, 110, C_WHITE, -1, "Score: %d!", gameScore);
 
 	drawHud(graphicsBuffer);
 	drawTurret(graphicsBuffer);
@@ -564,17 +571,22 @@ void stageInGame::drawHud(BITMAP *graphicsBuffer) {
 
 	line(graphicsBuffer, 0, BASE_Y_COORDINATE, SCREEN_W, BASE_Y_COORDINATE, C_GREEN);
 
+	textprintf_ex(graphicsBuffer, font, 10, 10, C_GREEN, C_BLACK, "Life: %d | Score: %d | Level: %d", gameLife, gameScore, gameLevel);
+
 	int XX = hudTargetX + TARGET_SIZE * 1.5;
 	if (XX > SCREEN_W - TARGET_SIZE * 3) XX = hudTargetX - TARGET_SIZE * 5;
 	if (hudTargetLocked) {
-		textout_ex(graphicsBuffer, font, currentQuestion.c_str(), XX, hudTargetY + 10, Col, -1);
+		textout_ex(graphicsBuffer, font, currentQuestion.c_str(), XX, hudTargetY + 10, Col, -1);		
+		textout_ex(graphicsBuffer, font, ("Current Question: "+ currentQuestion).c_str(), 10, 25, C_GREEN, C_BLACK);		
 		if (currentUserInput != "") {
 			textout_ex(graphicsBuffer, font, currentUserInput.c_str(), XX + text_length(font,(currentQuestion).c_str()), hudTargetY + 10, Col, -1);		
+			textout_ex(graphicsBuffer, font, currentUserInput.c_str(), 15 + text_length(font,("Current Question: "+ currentQuestion).c_str()), 25, C_GREEN, C_BLACK);		
 			}
 				else
 			{
 			if (currentQuestionFlickerOn) {
-				textout_ex(graphicsBuffer, font, "?", XX + text_length(font, (currentQuestion).c_str()), hudTargetY + 10, Col, -1);				
+				textout_ex(graphicsBuffer, font, "?", XX + text_length(font, (currentQuestion).c_str()), hudTargetY + 10, Col, -1);		
+				textout_ex(graphicsBuffer, font, "?", 15 + text_length(font, ("Current Question: "+ currentQuestion).c_str()), 25, C_GREEN, C_BLACK);			
 				}
 			if (clock() > currentQuestionFlickerNextChange) {
 				currentQuestionFlickerNextChange = clock() + currentQuestionFlickerChangeDuration * CLOCKS_PER_SEC;

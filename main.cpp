@@ -39,14 +39,28 @@ int main(int argc, char * argv[]) {
 	LOCK_FUNCTION(updateTicks);
 
 
-	globalData::gameResolutionX = DEFUALT_GFX_WIDTH;
-	globalData::gameResolutionY = DEFUALT_GFX_HEIGHT;
-	globalData::gameFullScreen = DEFUALT_GFX_FULLSCREEN;
+	globalData::read();
 
+	int success;
 	if (globalData::gameFullScreen) 
-		set_gfx_mode(GFX_AUTODETECT_FULLSCREEN, globalData::gameResolutionX, globalData::gameResolutionY, 0, 0);
+		success = set_gfx_mode(GFX_AUTODETECT_FULLSCREEN, globalData::gameResolutionX, globalData::gameResolutionY, 0, 0);
 	else
-		set_gfx_mode(GFX_AUTODETECT_WINDOWED, globalData::gameResolutionX, globalData::gameResolutionY, 0, 0);
+		success = set_gfx_mode(GFX_AUTODETECT_WINDOWED, globalData::gameResolutionX, globalData::gameResolutionY, 0, 0);
+
+	if (success < 0) {
+		allegro_message("Current graphics settings failed. Attempting failsafe.");
+		globalData::failSafe();
+
+		if (globalData::gameFullScreen) 
+			success = set_gfx_mode(GFX_AUTODETECT_FULLSCREEN, globalData::gameResolutionX, globalData::gameResolutionY, 0, 0);
+		else
+			success = set_gfx_mode(GFX_AUTODETECT_WINDOWED, globalData::gameResolutionX, globalData::gameResolutionY, 0, 0);
+		
+		if (success < 0) {
+			allegro_message("Failsafe... failed. Well game over.");
+			return EXIT_FAILURE;			
+			}
+		}
 
 	globalData::gameStartTime = time (NULL);
 	globalData::gameGraphicsBuffer = create_bitmap(SCREEN_W, SCREEN_H);
@@ -88,8 +102,6 @@ int main(int argc, char * argv[]) {
 		if (globalData::isGameRunning() == true) {
 			blit(globalData::gameGraphicsBuffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 			globalData::gameCurrentStage->draw(globalData::gameGraphicsBuffer);
-			textprintf_ex(globalData::gameGraphicsBuffer, font, 10, 50, makecol(255, 255, 255), -1, "Fps: %d", frameLastRate);
-			textprintf_ex(globalData::gameGraphicsBuffer, font, 80, 50, makecol(255, 255, 255), -1, "Pressed: %d", (int)keyboard::isKeyPressed(KEY_P));
 			}
 
 		rest(1);

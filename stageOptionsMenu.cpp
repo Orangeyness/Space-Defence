@@ -165,15 +165,42 @@ bool stageOptionsMenu::update() {
 
 	if ((keyboard::isKeyPressed(KEY_ENTER) || keyboard::isKeyPressed(KEY_ENTER_PAD)) && bntApply->Selected) {
 
+		bool dataBackupFS = globalData::gameFullScreen;
+		int dataBackupRX = globalData::gameResolutionX;
+		int dataBackupRY = globalData::gameResolutionY;
+
 		globalData::gameFullScreen = fullScreen;
 		globalData::gameResolutionX = resolutions[resolution][0];
 		globalData::gameResolutionY = resolutions[resolution][1];
 
+		int success;
+
 		if (globalData::gameFullScreen) 
-			set_gfx_mode(GFX_AUTODETECT_FULLSCREEN, globalData::gameResolutionX, globalData::gameResolutionY, 0, 0);
+			success = set_gfx_mode(GFX_AUTODETECT_FULLSCREEN, globalData::gameResolutionX, globalData::gameResolutionY, 0, 0);
 		else
-			set_gfx_mode(GFX_AUTODETECT_WINDOWED, globalData::gameResolutionX, globalData::gameResolutionY, 0, 0);
+			success = set_gfx_mode(GFX_AUTODETECT_WINDOWED, globalData::gameResolutionX, globalData::gameResolutionY, 0, 0);
 	
+		if (success < 0) {
+			allegro_message("Graphics mode failed, reverting to previous resolution.");
+
+			globalData::gameFullScreen = dataBackupFS;
+			globalData::gameResolutionX = dataBackupRX;
+			globalData::gameResolutionY = dataBackupRY;
+
+			if (globalData::gameFullScreen) 
+				success = set_gfx_mode(GFX_AUTODETECT_FULLSCREEN, globalData::gameResolutionX, globalData::gameResolutionY, 0, 0);
+			else
+				success = set_gfx_mode(GFX_AUTODETECT_WINDOWED, globalData::gameResolutionX, globalData::gameResolutionY, 0, 0);
+
+			if (success < 0) {
+				allegro_message("Previous graphics mode failed, your pretty much screwed.");			
+				}
+			}
+				else
+			{
+			globalData::write();
+			}
+
 		destroy_bitmap(globalData::gameGraphicsBuffer);
 		globalData::gameGraphicsBuffer = create_bitmap(SCREEN_W, SCREEN_H);
 
