@@ -24,6 +24,7 @@ namespace objects {
 
 	class ObjectInterface {
 		public:
+                        virtual ~ObjectInterface() { }
 			virtual bool update(LinkedList<ObjectInterface*> *Asteroids, LinkedList<ObjectInterface*> *Particles) = 0; //updates the object. false = delete object, true = keep object
 			virtual void draw(BITMAP *graphicsBuffer) = 0; //draws the object onto the given bitmap.
 		};

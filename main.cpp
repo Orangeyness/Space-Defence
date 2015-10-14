@@ -72,7 +72,6 @@ int main(int argc, char * argv[]) {
 
 	int frameDesiredRate = FPS_TARGET;
 	int frameDesiredLength = 1000/frameDesiredRate;
-	int frameLastRate = frameDesiredRate;
 	int framePastThisSecond = 0;
 	time_t frameSecondStartTime = globalData::gameStartTime;
 
@@ -80,7 +79,6 @@ int main(int argc, char * argv[]) {
 
 	while(globalData::isGameRunning() == true) {
 		if (difftime(time(NULL), frameSecondStartTime) >= 1) {
-			frameLastRate = framePastThisSecond;
 			framePastThisSecond = 0;
 			frameSecondStartTime = time(NULL);
 			}

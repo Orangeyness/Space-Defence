@@ -96,7 +96,7 @@ void stageAboutGame::draw(BITMAP *graphicsBuffer) {
 			textout_ex	(graphicsBuffer, font, "shower you might say. You control a turret ", SCREEN_W/2-180, SCREEN_H/2-35, C_GREEN, -1);
 			textout_ex	(graphicsBuffer, font, "in the bottom left corner of the screen.   ", SCREEN_W/2-180, SCREEN_H/2-20, C_GREEN, -1);
 			textout_ex	(graphicsBuffer, font, "To destroy the asteroids you are required to", SCREEN_W/2-180, SCREEN_H/2-5, C_GREEN, -1);
-			textout_ex	(graphicsBuffer, font, "first solve a maths questoin.              ", SCREEN_W/2-180, SCREEN_H/2+10, C_GREEN, -1);
+			textout_ex	(graphicsBuffer, font, "first solve a maths question.              ", SCREEN_W/2-180, SCREEN_H/2+10, C_GREEN, -1);
 			textout_ex	(graphicsBuffer, font, "Have, fun.", SCREEN_W/2-180, SCREEN_H/2+40, C_GREEN, -1);
 			} break;
 		case 1: {

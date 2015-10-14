@@ -406,7 +406,6 @@ void stageInGame::generateQuestion() {
 	int additionChance = 70;
 	int subtractionChance = 30;
 	int multiplicationChance = 0;
-	int divisionChance = 0;
 	
 	if (currentQuestionDifficuilty == 1) {
 		additionChance = 60;
@@ -442,49 +441,42 @@ void stageInGame::generateQuestion() {
 		additionChance = 30;
 		subtractionChance = 30;
 		multiplicationChance = 30;
-		divisionChance = 10;
 		}
 
 	if (currentQuestionDifficuilty == 7) {
 		additionChance = 25;
 		subtractionChance = 30;
 		multiplicationChance = 30;
-		divisionChance = 15;
 		}
 
 	if (currentQuestionDifficuilty == 8) {
 		additionChance = 20;
 		subtractionChance = 25;
 		multiplicationChance = 35;
-		divisionChance = 20;
 		}
 
 	if (currentQuestionDifficuilty == 9) {
 		additionChance = 15;
 		subtractionChance = 20;
 		multiplicationChance = 40;
-		divisionChance = 25;
 		}
 
 	if (currentQuestionDifficuilty == 10) {
 		additionChance = 10;
 		subtractionChance = 10;
 		multiplicationChance = 50;
-		divisionChance = 30;
 		}
 
 	if (currentQuestionDifficuilty == 11) {
 		additionChance = 0;
 		subtractionChance = 10;
 		multiplicationChance = 50;
-		divisionChance = 40;
 		}
 
 	if (currentQuestionDifficuilty >= 12) {
 		additionChance = 0;
 		subtractionChance = 0;
 		multiplicationChance = 50;
-		divisionChance = 50;
 		}
 
 	int number = rand()%100;
